@@ -15,12 +15,18 @@ print('Start!')
 # Initialize the ICM20948 sensor object
 icm20948 = ICM20948()
 
-# Initialize the Neopixel object for controlling the RGB LED
+# Initialize the Neopixel object to control RGB LED lights
 strip = Neopixel(1, 0, LED_PIN, "GRB")
 
+# Set the brightness of the LED lights to the value defined as LED_BRIGHTNESS
+strip.brightness(LED_BRIGHTNESS)
+
+# Fill all the LED lights on the Neopixel strip with the color yellow
+strip.fill(LED_COLORS['yellow'])
+
 # Main program loop
-while (True): 
-    # Show the current state of the RGB LED
+while (True):
+    # Show the current state of the LED lights on the Neopixel strip
     strip.show()
     
     # Read Gyroscope and Accelerometer data from the ICM20948 sensor
@@ -50,3 +56,4 @@ while (True):
     print("-----")
     print('{:<10} {:<10}'.format('Pitch', 'Roll'))
     print('{:<10.2f} {:<10.2f}'.format(pitch, roll))
+    

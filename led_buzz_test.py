@@ -9,8 +9,12 @@ from lib.icm20948 import *
 import socket
 import random
 from lib.neopixel import Neopixel
+from haptic_motor import *
 
 print('Start!')
+
+# Initialization of the vibration motor
+setup_haptic_motor()
 
 # Initialize the ICM20948 sensor object
 icm20948 = ICM20948()
@@ -24,8 +28,14 @@ strip.brightness(LED_BRIGHTNESS)
 # Fill all the LED lights on the Neopixel strip with the color yellow
 strip.fill(LED_COLORS['yellow'])
 
+# Variable to control the vibration motor
+vibration_enabled = 0
+
+# ADC pin
+adc_pin = machine.ADC(Pin(26))
+
 # Main program loop
-while (True):
+while (True):    
     # Show the current state of the LED lights on the Neopixel strip
     strip.show()
     
@@ -56,4 +66,16 @@ while (True):
     print("-----")
     print('{:<10} {:<10}'.format('Pitch', 'Roll'))
     print('{:<10.2f} {:<10.2f}'.format(pitch, roll))
+    
+    # Read ADC value
+    adc_value = adc_pin.read_u16()
+
+    # Toggle vibration motor variable when ADC value reaches 1000
+    if adc_value >= 1000:
+        vibration_enabled = 1 - vibration_enabled
+        print("Vibration Enabled:", vibration_enabled)
+
+    # Activate/deactivate vibration motor based on the variable
+    if vibration_enabled:
+        vibrate_haptic_motor()
     

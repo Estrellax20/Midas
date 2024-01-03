@@ -29,7 +29,9 @@ def vibrate_haptic_motor():
         i2c.writeto(POLOLU_1638_ADDR, bytearray([0x04 + seq, wave]))  # Set waveform
         i2c.writeto(POLOLU_1638_ADDR, bytearray([0x0C, 0x01]))  # Go command
         sleep_ms(800)
-
+        
+        print(wave) # only for test
+        
         if wave % 8 == 0:
             seq += 1
         if wave % 64 == 0:

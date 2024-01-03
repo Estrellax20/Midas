@@ -9,12 +9,12 @@ from lib.icm20948 import *
 import socket
 import random
 from lib.neopixel import Neopixel
-from haptic_motor import *
+#from i2c import *
 
 print('Start!')
 
 # Initialization of the vibration motor
-setup_haptic_motor()
+#setup_haptic_motor()
 
 # Initialize the ICM20948 sensor object
 icm20948 = ICM20948()
@@ -76,6 +76,6 @@ while (True):
         print("Vibration Enabled:", vibration_enabled)
 
     # Activate/deactivate vibration motor based on the variable
-    if vibration_enabled:
-        vibrate_haptic_motor()
+#    if vibration_enabled:
+#       vibrate_haptic_motor()
     

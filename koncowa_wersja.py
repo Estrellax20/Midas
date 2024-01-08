@@ -10,6 +10,9 @@ import socket
 import random
 from lib.neopixel import Neopixel
 from i2c import *
+from adc import *
+
+# ... (import statements)
 
 print('Start!')
 
@@ -32,13 +35,20 @@ strip.fill(LED_COLORS['yellow'])
 vibration_enabled = 0
 
 # ADC pin
-adc_pin = machine.ADC(Pin(26))
+adc_pin = machine.ADC(machine.Pin(26))
+
+# Configure the ADC
+adc_pin.atten(machine.ADC.ATTN_11DB)
+adc_pin.width(machine.ADC.WIDTH_10BIT)
 
 # Main program loop
-while (True):    
+while True:
+    # Read ADC value
+    scaled_adc_value = adc_pin.read_u16()
+
     # Show the current state of the LED lights on the Neopixel strip
     strip.show()
-    
+
     # Read Gyroscope and Accelerometer data from the ICM20948 sensor
     icm20948.icm20948_Gyro_Accel_Read()
 
@@ -62,20 +72,44 @@ while (True):
     pitch = math.asin(-2 * q1 * q3 + 2 * q0 * q2) * 57.3
     roll = math.atan2(2 * q2 * q3 + 2 * q0 * q1, -2 * q1 * q1 - 2 * q2 * q2 + 1) * 57.3
 
-    # Print pitch and roll values in a formatted table
-    print("-----")
-    print('{:<10} {:<10}'.format('Pitch', 'Roll'))
-    print('{:<10.2f} {:<10.2f}'.format(pitch, roll))
-    
-    # Read ADC value
-    adc_value = adc_pin.read_u16()
-
     # Toggle vibration motor variable when ADC value reaches 1000
-    if adc_value >= 1000:
-        vibration_enabled = 1 - vibration_enabled
+    if scaled_adc_value >= 2000 and not vibration_enabled:
+        vibration_enabled = 1
         print("Vibration Enabled:", vibration_enabled)
+        
+        # Other actions related to enabling vibration
+        vibrate_haptic_motor_once()
+        #playsong(yellow)
+        strip.fill(LED_COLORS['red'])
+        strip.show()
 
-    # Activate/deactivate vibration motor based on the variable
-    if vibration_enabled:
-       vibrate_haptic_motor()
-    
+    elif scaled_adc_value < 2000 and vibration_enabled:
+        vibration_enabled = 0
+        print("Vibration Disabled:", vibration_enabled)
+
+        # Print pitch and roll values in a formatted table
+        print("-----")
+        print('{:<10} {:<10}'.format('Pitch', 'Roll'))
+        print('{:<10.2f} {:<10.2f}'.format(pitch, roll))
+
+        # Print adc value
+        print("Scaled_ADC_Value:", scaled_adc_value)
+
+        vibrate_haptic_motor()
+
+        # Turn on the buzzer
+        #playsong(yellow)
+
+        # Change the LED color to red
+        strip.fill(LED_COLORS['red'])
+        strip.show()
+
+        # Vibrate once
+        vibrate_haptic_motor_once()
+
+        # Turn off the buzzer
+        #buzzer_off()
+
+        # Change the LED color back to yellow
+        strip.fill(LED_COLORS['yellow'])
+        strip.show()

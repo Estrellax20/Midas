@@ -1,3 +1,3 @@
 from lib.buzzer import *
 
-playsong(song)
+playsong(yellow)

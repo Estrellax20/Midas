@@ -30,12 +30,30 @@ def vibrate_haptic_motor():
         i2c.writeto(POLOLU_1638_ADDR, bytearray([0x0C, 0x01]))  # Go command
         sleep_ms(800)
         
-        print(wave) # only for test
+        #print(wave) # only for test
         
         if wave % 8 == 0:
             seq += 1
         if wave % 64 == 0:
             seq = 0
+            
+def turn_on_haptic_motor():
+    # Set waveform
+    i2c.writeto(POLOLU_1638_ADDR, bytearray([0x04, 1]))
+    # Go command
+    i2c.writeto(POLOLU_1638_ADDR, bytearray([0x0C, 0x01]))
+
+def turn_off_haptic_motor():
+    # Stop command
+    i2c.writeto(POLOLU_1638_ADDR, bytearray([0x0C, 0x00]))
+            
+def vibrate_haptic_motor_once():
+    # Assuming you have a function to turn on the haptic motor
+    turn_on_haptic_motor()
+    # Pause for a short duration
+    sleep(0.1)
+    # Assuming you have a function to turn off the haptic motor
+    turn_off_haptic_motor()
 
 # Initializing the haptic motor
 setup_haptic_motor()

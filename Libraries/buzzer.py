@@ -18,6 +18,7 @@ tones = {
 }
 
 song = ["E5","G5","A5","P","E5","G5","B5","A5","P","E5","G5","A5","P","G5","E5"]
+
 yellow = ["E4", "G4", "A4", "B4", "G4", "A4", "B4", "A4", "E4", "G4", "A4", "B4", "G4", "A4", "B4", "A4", 0,
           "B4", "C5", "B4", "A4", "G4", "A4", "B4", "A4", "G4", "A4", "B4", "A4", "G4", "A4", "B4", "A4", 0]
 
@@ -33,6 +34,10 @@ def playtone(frequency):
 
 def bequiet():
     buzzer.duty_u16(0)
+
+def buzzer_off():
+    # Stop playing any tone
+    bequiet()
 
 def playsong(mysong):
     for i in range(len(mysong)):

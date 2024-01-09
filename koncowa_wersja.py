@@ -1,23 +1,25 @@
 import network
 import ubinascii
-from lib.buzzer import *
-import urequests as requests
-import time
-from config import *
-import machine
-from lib.icm20948 import *
 import socket
 import random
-from lib.neopixel import Neopixel
-from i2c import *
-from adc import *
+import urequests as requests
+import time
 
-# ... (import statements)
+from adc import *
+from config import *
+from i2cc import *
+from lib.buzzer import *
+from lib.icm20948 import *
+from lib.neopixel import Neopixel
+
+I2C_SDA_PIN = 0
+I2C_SCL_PIN = 1
+ADR = 0x5A
+MEM1 = 0x01
+BUF1 = 0x00
+i2c=I2C(0,sda=Pin(I2C_SDA_PIN), scl=Pin(I2C_SCL_PIN), freq=400000)
 
 print('Start!')
-
-# Initialization of the vibration motor
-setup_haptic_motor()
 
 # Initialize the ICM20948 sensor object
 icm20948 = ICM20948()
@@ -28,24 +30,14 @@ strip = Neopixel(1, 0, LED_PIN, "GRB")
 # Set the brightness of the LED lights to the value defined as LED_BRIGHTNESS
 strip.brightness(LED_BRIGHTNESS)
 
-# Fill all the LED lights on the Neopixel strip with the color yellow
-strip.fill(LED_COLORS['yellow'])
-
 # Variable to control the vibration motor
 vibration_enabled = 0
 
 # ADC pin
 adc_pin = machine.ADC(machine.Pin(26))
 
-# Configure the ADC
-adc_pin.atten(machine.ADC.ATTN_11DB)
-adc_pin.width(machine.ADC.WIDTH_10BIT)
-
 # Main program loop
 while True:
-    # Read ADC value
-    scaled_adc_value = adc_pin.read_u16()
-
     # Show the current state of the LED lights on the Neopixel strip
     strip.show()
 
@@ -59,7 +51,7 @@ while True:
     icm20948.icm20948CalAvgValue()
 
     # Pause for 0.1 seconds
-    time.sleep(0.1)
+    time.sleep(0.01)
 
     # Update the AHRS (Attitude and Heading Reference System) values using sensor data
     q0, q1, q2, q3 = icm20948.imuAHRSupdate(
@@ -71,20 +63,26 @@ while True:
     # Calculate pitch and roll angles from quaternion values
     pitch = math.asin(-2 * q1 * q3 + 2 * q0 * q2) * 57.3
     roll = math.atan2(2 * q2 * q3 + 2 * q0 * q1, -2 * q1 * q1 - 2 * q2 * q2 + 1) * 57.3
+    
+    # Read ADC value
+    scaled_adc_value = adc_scaled()
 
     # Toggle vibration motor variable when ADC value reaches 1000
-    if scaled_adc_value >= 2000 and not vibration_enabled:
+    if scaled_adc_value >= 3000 and not vibration_enabled:
         vibration_enabled = 1
-        print("Vibration Enabled:", vibration_enabled)
-        
-        # Other actions related to enabling vibration
-        vibrate_haptic_motor_once()
-        #playsong(yellow)
-        strip.fill(LED_COLORS['red'])
+        strip.fill(LED_COLORS['blue'])
         strip.show()
+        vibration()
+        
+        print("Vibration Enabled:", vibration_enabled)
 
-    elif scaled_adc_value < 2000 and vibration_enabled:
+    elif scaled_adc_value < 3000 and vibration_enabled:
         vibration_enabled = 0
+        
+        # Change the LED color to red
+        strip.fill(LED_COLORS['yellow'])
+        strip.show()
+        
         print("Vibration Disabled:", vibration_enabled)
 
         # Print pitch and roll values in a formatted table
@@ -94,22 +92,3 @@ while True:
 
         # Print adc value
         print("Scaled_ADC_Value:", scaled_adc_value)
-
-        vibrate_haptic_motor()
-
-        # Turn on the buzzer
-        #playsong(yellow)
-
-        # Change the LED color to red
-        strip.fill(LED_COLORS['red'])
-        strip.show()
-
-        # Vibrate once
-        vibrate_haptic_motor_once()
-
-        # Turn off the buzzer
-        #buzzer_off()
-
-        # Change the LED color back to yellow
-        strip.fill(LED_COLORS['yellow'])
-        strip.show()

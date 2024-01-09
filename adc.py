@@ -7,7 +7,7 @@ adc_pin = ADC(Pin(26))
 # Maximum ADC value
 max_adc_value = 4095
 
-while True:
+def adc_scaled():
     # Read ADC value
     adc_value = adc_pin.read_u16()
     

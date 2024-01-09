@@ -2,7 +2,7 @@ from machine import Pin, PWM
 from utime import sleep
 from config import *
 
-buzzer = PWM(Pin(BUZZER_PIN))
+#buzzer = PWM(Pin(BUZZER_PIN))
 
 tones = {
 "B0": 31,"C1": 33,"CS1": 35,"D1": 37,"DS1": 39,"E1": 41,"F1": 44,"FS1": 46,
@@ -47,4 +47,3 @@ def playsong(mysong):
             playtone(tones[mysong[i]])
         sleep(0.3)
     bequiet()
-playsong(yellow)
